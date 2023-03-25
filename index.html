@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moisture Wicking Simulation</title>
+  <link rel="stylesheet" href="styles.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+	<script src="molecularSimulation.js"></script>
+
+
+</head>
+<body>
+  <h1>Moisture Wicking Simulation</h1>
+  <div class="container">
+	<div id="simulation"></div>
+  <label for="timeScale">Time Scale: </label>
+  <input type="range" id="timeScale" min="1" max="10" value="1" step="0.1" onchange="updateTimeScale()">
+  </div>
+</body>
+</html>
