@@ -44,14 +44,77 @@ function setupCamera(camera) {
     camera.position.set(10, 5, 10);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 }
-function simulateCapillaryAction(scene) {
-    // Calculate inter-molecular forces and update positions of water particles
-    // This is a placeholder for the actual simulation logic
+function simulateCapillaryAction(scene, timeStep) {
+    // Constants
+    const kB = 1.38064852e-23; // Boltzmann constant (J/K)
+    const temperature = 298.15; // Room temperature (K)
+
+    // Calculate inter-molecular forces
     scene.traverse((object) => {
         if (object.type === 'Mesh' && object.geometry.type === 'SphereGeometry') {
-            object.position.y += 0.001 * Math.random();
+            // Get neighboring particles within a certain radius
+            const neighbors = getNeighbors(scene, object, 1.0);
+
+            // Calculate van der Waals forces
+            const vdwForce = calculateVanDerWaalsForce(object, neighbors);
+
+            // Calculate hydrogen bonding forces
+            const hbForce = calculateHydrogenBondingForce(object, neighbors);
+
+            // Calculate electrostatic interactions
+            const elecForce = calculateElectrostaticInteractions(object, neighbors);
+
+            // Combine all forces
+            const totalForce = vdwForce.add(hbForce).add(elecForce);
+
+            // Update positions based on the total force and time step
+            object.position.x += totalForce.x * timeStep;
+            object.position.y += totalForce.y * timeStep;
+            object.position.z += totalForce.z * timeStep;
         }
     });
+}
+function getNeighbors(scene, particle, radius) {
+    const neighbors = [];
+
+    scene.traverse((object) => {
+        if (
+            object.type === 'Mesh' &&
+            object.geometry.type === 'SphereGeometry' &&
+            object.uuid !== particle.uuid
+        ) {
+            const distance = object.position.distanceTo(particle.position);
+
+            if (distance <= radius) {
+                neighbors.push(object);
+            }
+        }
+    });
+
+    return neighbors;
+}
+function calculateVanDerWaalsForce(particle, neighbors) {
+    const epsilon = 1; // Lennard-Jones well depth (unit: energy)
+    const sigma = 1; // Lennard-Jones distance (unit: length)
+
+    const force = new THREE.Vector3(0, 0, 0);
+
+    neighbors.forEach((neighbor) => {
+        const distanceVec = particle.position.clone().sub(neighbor.position);
+        const distance = distanceVec.length();
+        const distanceRatio = Math.pow(sigma / distance, 6);
+
+        const forceMagnitude = 24 * epsilon * (2 * Math.pow(distanceRatio, 2) - distanceRatio) / distance;
+
+        const forceVec = distanceVec.normalize().multiplyScalar(forceMagnitude);
+        force.add(forceVec);
+    });
+
+    return force;
+}
+function calculateHydrogenBondingForce(particle, neighbors) {
+    // Placeholder for actual hydrogen bonding force calculations
+    return new THREE.Vector3(0, 0, 0);
 }
 function main() {
     const { scene, camera, renderer } = init();
@@ -64,5 +127,8 @@ function main() {
         simulateCapillaryAction(scene);
     }, 1000 / 60); // Update simulation at 60 FPS
 }
-
+function calculateElectrostaticInteractions(particle, neighbors) {
+    // Placeholder for actual electrostatic interaction calculations
+    return new THREE.Vector3(0, 0, 0);
+}
 main();
