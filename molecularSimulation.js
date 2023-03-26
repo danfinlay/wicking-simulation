@@ -1,6 +1,6 @@
 let grid;
 let gridSize = 100;
-let hydrophilicChance = 0.4;
+let hydrophilicChance = 0.2;
 let timeScale = 1;
 let frameCounter = 0;
 
@@ -26,8 +26,8 @@ class Grid {
     this.size = size;
     this.cellSize = width / size;
     this.cells = new Array(size * size).fill(0).map((_, i) => {
-      if (i >= size * (size - 1) && random() < hydrophilicChance) return 2; // Hydrophilic cells
-      if (i < size * (size - 1) && random() < 0.2) return 1; // Water particles
+      if (i < size * (size - 1) && random() < hydrophilicChance) return 2; // Hydrophilic cells
+      if (i > size * (size - 1) && random() < 0.2) return 1; // Water particles
       return 0; // Empty cells
     });
   }
@@ -36,8 +36,7 @@ class Grid {
     frameCounter++;
     if (frameCounter >= Math.round(1 / timeScale)) {
       frameCounter = 0;
-      // Add the existing code for updating the cells here
-      for (let i = this.cells.length - this.size; i >= 0; i--) {
+      for (let i=this.cells.length; i>= this.size;  i--) {
         if (this.cells[i] === 1) {
           let above = i - this.size;
           let left = i - 1;
