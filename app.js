@@ -113,8 +113,40 @@ function calculateVanDerWaalsForce(particle, neighbors) {
     return force;
 }
 function calculateHydrogenBondingForce(particle, neighbors) {
-    // Placeholder for actual hydrogen bonding force calculations
-    return new THREE.Vector3(0, 0, 0);
+    const hbStrength = 5; // Arbitrary hydrogen bond strength (unit: energy)
+
+    const force = new THREE.Vector3(0, 0, 0);
+
+    neighbors.forEach((neighbor) => {
+        const distanceVec = particle.position.clone().sub(neighbor.position);
+        const distance = distanceVec.length();
+
+        // Check if the distance is within the hydrogen bonding range (e.g., 0.1 to 0.35 nm for water)
+        if (distance > 0.1 && distance < 0.35) {
+            const forceMagnitude = -hbStrength / Math.pow(distance, 2);
+            const forceVec = distanceVec.normalize().multiplyScalar(forceMagnitude);
+            force.add(forceVec);
+        }
+    });
+
+    return force;
+}
+function calculateElectrostaticInteractions(particle, neighbors) {
+    const chargeParticle = -0.834; // Partial charge of a water molecule (unit: elementary charge)
+    const k = 8.9875517923e9; // Coulomb's constant (N m^2 C^-2)
+
+    const force = new THREE.Vector3(0, 0, 0);
+
+    neighbors.forEach((neighbor) => {
+        const distanceVec = particle.position.clone().sub(neighbor.position);
+        const distance = distanceVec.length();
+
+        const forceMagnitude = k * chargeParticle * chargeParticle / Math.pow(distance, 2);
+        const forceVec = distanceVec.normalize().multiplyScalar(forceMagnitude);
+        force.add(forceVec);
+    });
+
+    return force;
 }
 function main() {
     const { scene, camera, renderer } = init();
@@ -126,9 +158,5 @@ function main() {
     setInterval(() => {
         simulateCapillaryAction(scene);
     }, 1000 / 60); // Update simulation at 60 FPS
-}
-function calculateElectrostaticInteractions(particle, neighbors) {
-    // Placeholder for actual electrostatic interaction calculations
-    return new THREE.Vector3(0, 0, 0);
 }
 main();
