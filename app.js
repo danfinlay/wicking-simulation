@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+const thresholdDistance = 5; // Threshold distance to consider neighbors
+const particles = [];
 
 function init() {
     const container = document.getElementById('simulation');
@@ -31,12 +33,22 @@ function createObjects(scene) {
     scene.add(material);
 
     // Add water particles (e.g., small spheres)
+    createWaterParticles(scene, 50);
+}
+function createWaterParticles(scene, numParticles) {
     const particleGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-    const particleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    const particleMaterial = new THREE.MeshPhongMaterial({ color: 0x00aaff });
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < numParticles; i++) {
         const particle = new THREE.Mesh(particleGeometry, particleMaterial);
-        particle.position.set(Math.random() * 5 - 2.5, Math.random() * 5 - 2.5, Math.random() * 5 - 2.5);
+
+        particle.position.set(
+            Math.random() * 10 - 5, // x: random position between -5 and 5
+            Math.random() * 3 + 2, // y: random position between 2 and 5
+            Math.random() * 10 - 5 // z: random position between -5 and 5
+        );
+
+        particles.push(particle);
         scene.add(particle);
     }
 }
@@ -50,45 +62,33 @@ function simulateCapillaryAction(scene, timeStep) {
     const temperature = 298.15; // Room temperature (K)
 
     // Calculate inter-molecular forces
-    scene.traverse((object) => {
-        if (object.type === 'Mesh' && object.geometry.type === 'SphereGeometry') {
-            // Get neighboring particles within a certain radius
-            const neighbors = getNeighbors(scene, object, 1.0);
+    particles.forEach((object) => {
+        // Get neighboring particles within a certain radius
+        const neighbors = getNeighbors(object, thresholdDistance);
+        console.log('a water drop has ' + neighbors.length + ' neighbors')
 
-            // Calculate van der Waals forces
-            const vdwForce = calculateVanDerWaalsForce(object, neighbors);
+        // Calculate van der Waals forces
+        const vdwForce = calculateVanDerWaalsForce(object, neighbors);
 
-            // Calculate hydrogen bonding forces
-            const hbForce = calculateHydrogenBondingForce(object, neighbors);
+        // Calculate hydrogen bonding forces
+        const hbForce = calculateHydrogenBondingForce(object, neighbors);
 
-            // Calculate electrostatic interactions
-            const elecForce = calculateElectrostaticInteractions(object, neighbors);
+        // Calculate electrostatic interactions
+        const elecForce = calculateElectrostaticInteractions(object, neighbors);
 
-            // Combine all forces
-            const totalForce = vdwForce.add(hbForce).add(elecForce);
+        // Combine all forces
+        const totalForce = vdwForce.add(hbForce).add(elecForce);
 
-            // Update positions based on the total force and time step
-            object.position.x += totalForce.x * timeStep;
-            object.position.y += totalForce.y * timeStep;
-            object.position.z += totalForce.z * timeStep;
-        }
+        // Update positions based on the total force and time step
+        object.position.x += totalForce.x * timeStep;
+        object.position.y += totalForce.y * timeStep;
+        object.position.z += totalForce.z * timeStep;
     });
 }
-function getNeighbors(scene, particle, radius) {
-    const neighbors = [];
-
-    scene.traverse((object) => {
-        if (
-            object.type === 'Mesh' &&
-            object.geometry.type === 'SphereGeometry' &&
-            object.uuid !== particle.uuid
-        ) {
-            const distance = object.position.distanceTo(particle.position);
-
-            if (distance <= radius) {
-                neighbors.push(object);
-            }
-        }
+function getNeighbors(particle, thresholdDistance) {
+    const neighbors = particles.filter((neighbor) => {
+        const distance = particle.position.distanceTo(neighbor.position);
+        return distance > 0 && distance < thresholdDistance;
     });
 
     return neighbors;
