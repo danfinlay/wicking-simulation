@@ -1,0 +1,23 @@
+{
+  "name": "wicking-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danfinlay/wicking-simulation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danfinlay/wicking-simulation/issues"
+  },
+  "homepage": "https://github.com/danfinlay/wicking-simulation#readme",
+  "dependencies": {
+    "three": "^0.150.1"
+  }
+}

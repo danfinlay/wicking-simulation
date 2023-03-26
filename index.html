@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moisture Wicking Simulation</title>
-  <link rel="stylesheet" href="styles.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-	<script src="molecularSimulation.js"></script>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capillary Action Simulator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Moisture Wicking Simulation</h1>
-  <div class="container">
-	<div id="simulation"></div>
-  <label for="timeScale">Time Scale: </label>
-  <input type="range" id="timeScale" min="0.00000001" max="100" value="1" step="1" onchange="updateTimeScale()">
-  </div>
+    <h1>Capillary Action Simulator</h1>
+    <div id="simulation"></div>
+    <script type="module" src="./app.js"></script>
 </body>
 </html>
